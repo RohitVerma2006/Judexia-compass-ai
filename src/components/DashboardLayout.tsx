@@ -1,36 +1,38 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Brain, MessageSquare, HelpCircle, BookOpen, FileText,
-  Users, Scale, Map, FileEdit, LogOut, Zap, Award
+  Users, Scale, Map, FileEdit, LogOut, Zap, Award, Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import judexiaLogo from '@/assets/judexia-logo.jpg';
 
-const NAV_ITEMS = [
-  { path: '/dashboard', label: 'Dashboard', icon: Zap },
-  { path: '/dashboard/case-studio', label: 'AI Case Studio', icon: Brain },
-  { path: '/dashboard/mentor', label: 'AI Legal Mentor', icon: MessageSquare },
-  { path: '/dashboard/quiz', label: 'Quiz Mode', icon: HelpCircle },
-  { path: '/dashboard/case-library', label: 'Case Library', icon: BookOpen },
-  { path: '/dashboard/simplifier', label: 'Doc Simplifier', icon: FileText },
-  { path: '/dashboard/forum', label: 'Community Forum', icon: Users },
-  { path: '/dashboard/consultation', label: 'Lawyer Consult', icon: Scale },
-  { path: '/dashboard/roadmap', label: 'Legal Roadmap', icon: Map },
-  { path: '/dashboard/notice', label: 'Draft Notice', icon: FileEdit },
-];
-
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, xp, getLevel, logout } = useAuth();
+  const { t, lang, setLang } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const level = getLevel();
 
-  const handleLogout = () => {
-    logout();
+  const NAV_ITEMS = [
+    { path: '/dashboard', label: t('dashboard'), icon: Zap },
+    { path: '/dashboard/case-studio', label: t('aiCaseStudio'), icon: Brain },
+    { path: '/dashboard/mentor', label: t('aiLegalMentor'), icon: MessageSquare },
+    { path: '/dashboard/quiz', label: t('quizMode'), icon: HelpCircle },
+    { path: '/dashboard/case-library', label: t('caseLibrary'), icon: BookOpen },
+    { path: '/dashboard/simplifier', label: t('docSimplifier'), icon: FileText },
+    { path: '/dashboard/forum', label: t('communityForum'), icon: Users },
+    { path: '/dashboard/consultation', label: t('lawyerConsult'), icon: Scale },
+    { path: '/dashboard/roadmap', label: t('legalRoadmap'), icon: Map },
+    { path: '/dashboard/notice', label: t('draftNotice'), icon: FileEdit },
+  ];
+
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
@@ -69,9 +71,31 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
+        {/* Language Toggle in Sidebar */}
+        <div className="px-4 pb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">{t('language')}</span>
+          </div>
+          <div className="flex gap-1 bg-secondary/40 rounded-lg p-1">
+            <button
+              onClick={() => setLang('en')}
+              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all ${lang === 'en' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              {t('english')}
+            </button>
+            <button
+              onClick={() => setLang('hi')}
+              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all ${lang === 'hi' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              {t('hindi')}
+            </button>
+          </div>
+        </div>
+
         <div className="p-4 border-t border-sidebar-border">
           <p className="text-xs text-muted-foreground/60 text-center">
-            Prototype Simulation
+            Judexia © 2026
           </p>
         </div>
       </aside>
@@ -82,7 +106,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <header className="h-16 border-b border-border bg-card/40 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-4">
             <h2 className="font-serif text-lg font-semibold text-foreground">
-              {NAV_ITEMS.find(i => i.path === location.pathname)?.label || 'Dashboard'}
+              {NAV_ITEMS.find(i => i.path === location.pathname)?.label || t('dashboard')}
             </h2>
           </div>
 
@@ -105,7 +129,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             {/* User */}
             <span className="text-sm text-foreground">{user?.fullName}</span>
 
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-destructive">
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-destructive" title={t('logout')}>
               <LogOut className="w-4 h-4" />
             </Button>
           </div>
@@ -119,7 +143,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Footer */}
         <footer className="px-6 py-3 border-t border-border text-center">
           <p className="text-xs text-muted-foreground/50">
-            Judexia is an educational platform and does not provide official legal advice. All AI outputs shown here are prototype simulations.
+            {t('disclaimer')}
           </p>
         </footer>
       </div>
