@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome to Law and Management System 
 
 ## Project info
 
