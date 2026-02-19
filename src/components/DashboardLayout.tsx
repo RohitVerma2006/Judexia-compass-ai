@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <img src={judexiaLogo} alt="Judexia" className="w-10 h-10 rounded-lg object-cover" />
           <div>
             <h1 className="font-serif text-lg font-bold text-foreground">Judexia</h1>
-            <p className="text-xs text-muted-foreground">Legal AI Platform</p>
+            <p className="text-xs text-muted-foreground">{t('legalAIPlatform')}</p>
           </div>
         </div>
 
@@ -99,7 +99,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         <div className="p-4 border-t border-sidebar-border">
           <p className="text-xs text-muted-foreground/60 text-center">
-            Judexia © 2026
+            {t('copyright')}
           </p>
         </div>
       </aside>

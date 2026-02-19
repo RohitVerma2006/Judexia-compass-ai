@@ -39,7 +39,7 @@ const Signup = () => {
     setLoading(true);
     try {
       await signup(fullName, email, password);
-      setSuccess('Account created! Please check your email to verify your account.');
+      setSuccess(t('verifyEmail'));
     } catch (err: any) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {
@@ -116,17 +116,20 @@ const Signup = () => {
 
           {success ? (
             <div className="text-center py-6 space-y-3">
-            <div className="w-12 h-12 rounded-full bg-electric/20 border border-electric/40 flex items-center justify-center mx-auto">
-              <span className="text-2xl text-electric">✓</span>
-            </div>
-            <p className="text-electric text-sm font-medium">{success}</p>
-              <p className="text-muted-foreground text-xs">After verifying your email, you can <Link to="/login" className="text-electric hover:underline">sign in here</Link>.</p>
+              <div className="w-12 h-12 rounded-full bg-electric/20 border border-electric/40 flex items-center justify-center mx-auto">
+                <span className="text-2xl text-electric">✓</span>
+              </div>
+              <p className="text-electric text-sm font-medium">{success}</p>
+              <p className="text-muted-foreground text-xs">
+                {t('afterVerify')}{' '}
+                <Link to="/login" className="text-electric hover:underline">{t('signInHere')}</Link>.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-foreground/80">{t('fullName')}</Label>
-                <Input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" required className="bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground" />
+                <Input value={fullName} onChange={e => setFullName(e.target.value)} placeholder={t('yourFullName')} required className="bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground" />
               </div>
               <div className="space-y-2">
                 <Label className="text-foreground/80">{t('email')}</Label>
@@ -146,7 +149,7 @@ const Signup = () => {
                 disabled={loading}
                 className="w-full gradient-electric text-foreground font-semibold glow-electric hover:opacity-90 transition-opacity"
               >
-                {loading ? 'Creating account...' : t('createAccount')}
+                {loading ? t('creatingAccount') : t('createAccount')}
               </Button>
             </form>
           )}
