@@ -88,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       redirect_uri: window.location.origin + '/dashboard',
     });
     if (result?.error) throw result.error;
+    // If not redirected, session is set synchronously — onAuthStateChange will handle state
   };
 
   const logout = async () => {

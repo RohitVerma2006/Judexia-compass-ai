@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'en' | 'hi';
 
@@ -42,6 +42,7 @@ export const translations = {
     lawyerConsult: 'Lawyer Consult',
     legalRoadmap: 'Legal Roadmap',
     draftNotice: 'Draft Notice',
+    aboutUs: 'About Us',
     logout: 'Logout',
     // Footer
     disclaimer: 'Judexia is an educational platform and does not provide official legal advice. All AI outputs shown here are prototype simulations.',
@@ -49,6 +50,25 @@ export const translations = {
     language: 'Language',
     english: 'English',
     hindi: 'Hindi',
+    // About page
+    aboutJudexia: 'About Judexia',
+    aboutSubtitle: 'Train Your Legal Mind with Intelligent Systems',
+    whoWeAre: 'Who We Are',
+    whoWeAreText1: 'Judexia is an AI-powered LegalTech learning platform designed to bridge the gap between citizens and the law.',
+    whoWeAreText2: 'We transform complex legal systems into interactive case simulations and intelligent guidance tools.',
+    ourVision: 'Our Vision',
+    visionText: 'We envision a future where legal knowledge is accessible, practical, and empowering for every digitally connected citizen. Judexia aims to build India\'s first AI-powered legal reasoning ecosystem — transforming legal confusion into legal confidence.',
+    whatMakesDifferent: 'What Makes Us Different',
+    feature1: 'Gamified Legal Reasoning',
+    feature1Desc: 'Learn law through interactive case simulations that make legal reasoning engaging and memorable.',
+    feature2: 'Conversational AI Mentorship',
+    feature2Desc: 'Get personalized guidance from our AI mentor trained on Indian legal frameworks.',
+    feature3: 'Document Simplification',
+    feature3Desc: 'Complex legal documents translated into plain language you can actually understand.',
+    feature4: 'India-Focused Design',
+    feature4Desc: 'Built specifically for India\'s legal system with mobile-first, multilingual support.',
+    feature5: 'Scalable AI Architecture',
+    feature5Desc: 'Enterprise-grade AI infrastructure that grows with your legal learning journey.',
   },
   hi: {
     // Auth
@@ -89,6 +109,7 @@ export const translations = {
     lawyerConsult: 'वकील परामर्श',
     legalRoadmap: 'कानूनी रोडमैप',
     draftNotice: 'नोटिस मसौदा',
+    aboutUs: 'हमारे बारे में',
     logout: 'लॉग आउट',
     // Footer
     disclaimer: 'Judexia एक शैक्षिक मंच है और आधिकारिक कानूनी सलाह नहीं देता। यहाँ दिखाए गए सभी AI आउटपुट प्रोटोटाइप सिमुलेशन हैं।',
@@ -96,6 +117,25 @@ export const translations = {
     language: 'भाषा',
     english: 'अंग्रेज़ी',
     hindi: 'हिंदी',
+    // About page
+    aboutJudexia: 'Judexia के बारे में',
+    aboutSubtitle: 'बुद्धिमान प्रणालियों के साथ अपना कानूनी दिमाग प्रशिक्षित करें',
+    whoWeAre: 'हम कौन हैं',
+    whoWeAreText1: 'Judexia एक AI-संचालित LegalTech शिक्षण मंच है जो नागरिकों और कानून के बीच की खाई को पाटने के लिए बनाया गया है।',
+    whoWeAreText2: 'हम जटिल कानूनी प्रणालियों को इंटरैक्टिव केस सिमुलेशन और बुद्धिमान मार्गदर्शन उपकरणों में बदलते हैं।',
+    ourVision: 'हमारी दृष्टि',
+    visionText: 'हम एक ऐसे भविष्य की कल्पना करते हैं जहाँ कानूनी ज्ञान प्रत्येक डिजिटल रूप से जुड़े नागरिक के लिए सुलभ, व्यावहारिक और सशक्त हो। Judexia भारत का पहला AI-संचालित कानूनी तर्क पारिस्थितिकी तंत्र बनाने का लक्ष्य रखता है।',
+    whatMakesDifferent: 'हमें क्या अलग बनाता है',
+    feature1: 'गेमिफाइड कानूनी तर्क',
+    feature1Desc: 'इंटरैक्टिव केस सिमुलेशन के माध्यम से कानून सीखें।',
+    feature2: 'संवादात्मक AI गुरु',
+    feature2Desc: 'भारतीय कानूनी ढांचे पर प्रशिक्षित AI गुरु से व्यक्तिगत मार्गदर्शन पाएं।',
+    feature3: 'दस्तावेज़ सरलीकरण',
+    feature3Desc: 'जटिल कानूनी दस्तावेज़ों को सरल भाषा में अनुवाद करें।',
+    feature4: 'भारत-केंद्रित डिज़ाइन',
+    feature4Desc: 'भारत की कानूनी प्रणाली के लिए विशेष रूप से निर्मित।',
+    feature5: 'स्केलेबल AI आर्किटेक्चर',
+    feature5Desc: 'एंटरप्राइज़-ग्रेड AI बुनियादी ढाँचा।',
   },
 } as const;
 
@@ -110,7 +150,15 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLangState] = useState<Language>(() => {
+    const stored = localStorage.getItem('judexia-lang');
+    return (stored === 'hi' ? 'hi' : 'en') as Language;
+  });
+
+  const setLang = (newLang: Language) => {
+    setLangState(newLang);
+    localStorage.setItem('judexia-lang', newLang);
+  };
 
   const t = (key: TranslationKey): string => translations[lang][key];
 

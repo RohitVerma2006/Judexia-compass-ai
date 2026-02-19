@@ -148,6 +148,9 @@ const Login = () => {
             {t('noAccount')}{' '}
             <Link to="/signup" className="text-electric hover:underline">{t('signUp')}</Link>
           </p>
+          <p className="text-center text-xs text-muted-foreground/50 mt-3">
+            <Link to="/about" className="hover:text-muted-foreground transition-colors">{t('aboutUs')}</Link>
+          </p>
         </div>
       </div>
     </div>

@@ -29,6 +29,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     { path: '/dashboard/consultation', label: t('lawyerConsult'), icon: Scale },
     { path: '/dashboard/roadmap', label: t('legalRoadmap'), icon: Map },
     { path: '/dashboard/notice', label: t('draftNotice'), icon: FileEdit },
+    { path: '/about', label: t('aboutUs'), icon: Globe, external: true },
   ];
 
   const handleLogout = async () => {
@@ -53,14 +54,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(item => {
             const Icon = item.icon;
-            const active = location.pathname === item.path;
+            const isAbout = item.path === '/about';
+            const active = !isAbout && location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                   active
-                    ? 'bg-sidebar-accent text-electric glow-electric/20 font-medium'
+                    ? 'bg-sidebar-accent text-electric font-medium'
+                    : isAbout
+                    ? 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground border-t border-sidebar-border mt-1 pt-2.5'
                     : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
                 }`}
               >
