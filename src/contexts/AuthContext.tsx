@@ -67,8 +67,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
+    // Immediately sync state so ProtectedRoute doesn't flash redirect
+    if (data.session?.user) {
+      setSession(data.session);
+      setUser(userFromSupabase(data.session.user));
+    }
   };
 
   const signup = async (fullName: string, email: string, password: string) => {

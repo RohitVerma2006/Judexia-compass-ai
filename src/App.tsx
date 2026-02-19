@@ -36,12 +36,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <DashboardLayout>{children}</DashboardLayout>;
 }
 
+// Redirect already-authenticated users away from public auth pages
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return (
+    <div className="min-h-screen gradient-bg flex items-center justify-center">
+      <div className="text-gold font-serif text-xl animate-pulse">Loading Judexia...</div>
+    </div>
+  );
+  if (user) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<Navigate to="/login" replace />} />
-    <Route path="/login" element={<Login />} />
-    <Route path="/signup" element={<Signup />} />
+    <Route path="/" element={<Navigate to="/about" replace />} />
     <Route path="/about" element={<About />} />
+    <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+    <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/dashboard/case-studio" element={<ProtectedRoute><CaseStudio /></ProtectedRoute>} />
     <Route path="/dashboard/mentor" element={<ProtectedRoute><AIMentor /></ProtectedRoute>} />

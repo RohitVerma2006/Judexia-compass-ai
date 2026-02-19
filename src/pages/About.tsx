@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import judexiaLogo from '@/assets/judexia-logo.jpg';
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
 
   const features = [
     { icon: Brain, key: 'feature1', descKey: 'feature1Desc' },
@@ -19,11 +19,26 @@ export default function About() {
       {/* Top Nav */}
       <nav className="border-b border-border/40 backdrop-blur-md bg-card/20 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/login" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <img src={judexiaLogo} alt="Judexia" className="w-9 h-9 rounded-lg object-cover" />
             <span className="font-serif text-lg font-bold text-foreground">Judexia</span>
           </Link>
           <div className="flex items-center gap-4">
+            {/* Language Toggle */}
+            <div className="flex items-center gap-1 bg-secondary/40 rounded-lg p-1">
+              <button
+                onClick={() => setLang('en')}
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${lang === 'en' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLang('hi')}
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${lang === 'hi' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                हिं
+              </button>
+            </div>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               {t('signIn')}
             </Link>
@@ -39,14 +54,13 @@ export default function About() {
 
       {/* Hero Section */}
       <section className="relative py-28 text-center overflow-hidden">
-        {/* Background glow */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-[600px] h-[600px] rounded-full bg-electric/5 blur-3xl" />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/30 bg-gold/5 text-gold text-xs font-medium mb-6 tracking-wider uppercase">
             <Scale className="w-3.5 h-3.5" />
-            LegalTech Platform
+            {t('legalTechPlatform')}
           </div>
           <h1 className="font-serif text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
             {t('aboutJudexia')}
@@ -83,11 +97,9 @@ export default function About() {
 
       {/* Section 2 – Our Vision */}
       <section className="py-20 px-6 relative overflow-hidden">
-        {/* Giant scale icon watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
           <Scale className="w-[400px] h-[400px] text-electric/3" strokeWidth={0.5} />
         </div>
-
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="glass-card-gold p-12 text-center">
             <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center mx-auto mb-8 animate-glow-pulse">
@@ -131,16 +143,16 @@ export default function About() {
             {/* CTA card */}
             <div className="glass-card-gold p-6 flex flex-col justify-between group hover:border-gold/50 transition-all duration-300">
               <div>
-                <h3 className="font-serif text-base font-semibold text-gold mb-2">Ready to Start?</h3>
+                <h3 className="font-serif text-base font-semibold text-gold mb-2">{t('readyToStart')}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Join India's premier AI-powered legal learning platform today.
+                  {t('readyToStartDesc')}
                 </p>
               </div>
               <Link
                 to="/signup"
                 className="mt-6 flex items-center gap-2 text-sm font-medium text-electric hover:gap-3 transition-all"
               >
-                Get Started <ArrowRight className="w-4 h-4" />
+                {t('getStarted')} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -152,7 +164,7 @@ export default function About() {
         <p className="text-xs text-muted-foreground/50 max-w-2xl mx-auto">
           {t('disclaimer')}
         </p>
-        <p className="text-xs text-muted-foreground/30 mt-3">Judexia © 2026</p>
+        <p className="text-xs text-muted-foreground/30 mt-3">{t('copyright')}</p>
       </footer>
     </div>
   );

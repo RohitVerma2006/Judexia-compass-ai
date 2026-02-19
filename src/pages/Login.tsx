@@ -140,7 +140,7 @@ const Login = () => {
               disabled={loading}
               className="w-full gradient-electric text-foreground font-semibold glow-electric hover:opacity-90 transition-opacity"
             >
-              {loading ? 'Signing in...' : t('signIn')}
+              {loading ? t('signingIn') : t('signIn')}
             </Button>
           </form>
 

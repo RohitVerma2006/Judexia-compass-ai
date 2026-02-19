@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'hi';
 
@@ -26,11 +26,18 @@ export const translations = {
     aiPowered: 'with Intelligent Systems powered by AI.',
     beginJourney: 'Begin Your Legal Journey',
     joinThousands: 'Join thousands of aspiring legal professionals.',
+    signingIn: 'Signing in...',
+    creatingAccount: 'Creating account...',
+    verifyEmail: 'Account created! Please check your email to verify your account.',
+    afterVerify: 'After verifying your email, you can',
+    signInHere: 'sign in here',
+    yourFullName: 'Your full name',
     // Dashboard
     welcomeBack2: 'Welcome back',
     youAre: "You're a",
     with: 'with',
     keepLearning: 'Keep learning to level up!',
+    loadingApp: 'Loading Judexia...',
     // Sidebar / Nav
     dashboard: 'Dashboard',
     aiCaseStudio: 'AI Case Studio',
@@ -44,6 +51,8 @@ export const translations = {
     draftNotice: 'Draft Notice',
     aboutUs: 'About Us',
     logout: 'Logout',
+    legalAIPlatform: 'Legal AI Platform',
+    copyright: 'Judexia © 2026',
     // Footer
     disclaimer: 'Judexia is an educational platform and does not provide official legal advice. All AI outputs shown here are prototype simulations.',
     // Language
@@ -53,11 +62,12 @@ export const translations = {
     // About page
     aboutJudexia: 'About Judexia',
     aboutSubtitle: 'Train Your Legal Mind with Intelligent Systems',
+    legalTechPlatform: 'LegalTech Platform',
     whoWeAre: 'Who We Are',
     whoWeAreText1: 'Judexia is an AI-powered LegalTech learning platform designed to bridge the gap between citizens and the law.',
     whoWeAreText2: 'We transform complex legal systems into interactive case simulations and intelligent guidance tools.',
     ourVision: 'Our Vision',
-    visionText: 'We envision a future where legal knowledge is accessible, practical, and empowering for every digitally connected citizen. Judexia aims to build India\'s first AI-powered legal reasoning ecosystem — transforming legal confusion into legal confidence.',
+    visionText: "We envision a future where legal knowledge is accessible, practical, and empowering for every digitally connected citizen. Judexia aims to build India's first AI-powered legal reasoning ecosystem — transforming legal confusion into legal confidence.",
     whatMakesDifferent: 'What Makes Us Different',
     feature1: 'Gamified Legal Reasoning',
     feature1Desc: 'Learn law through interactive case simulations that make legal reasoning engaging and memorable.',
@@ -66,9 +76,12 @@ export const translations = {
     feature3: 'Document Simplification',
     feature3Desc: 'Complex legal documents translated into plain language you can actually understand.',
     feature4: 'India-Focused Design',
-    feature4Desc: 'Built specifically for India\'s legal system with mobile-first, multilingual support.',
+    feature4Desc: "Built specifically for India's legal system with mobile-first, multilingual support.",
     feature5: 'Scalable AI Architecture',
     feature5Desc: 'Enterprise-grade AI infrastructure that grows with your legal learning journey.',
+    readyToStart: 'Ready to Start?',
+    readyToStartDesc: "Join India's premier AI-powered legal learning platform today.",
+    getStarted: 'Get Started',
   },
   hi: {
     // Auth
@@ -93,11 +106,18 @@ export const translations = {
     aiPowered: 'AI द्वारा संचालित बुद्धिमान प्रणालियों के साथ।',
     beginJourney: 'अपनी कानूनी यात्रा शुरू करें',
     joinThousands: 'हजारों महत्वाकांक्षी कानूनी पेशेवरों से जुड़ें।',
+    signingIn: 'साइन इन हो रहा है...',
+    creatingAccount: 'खाता बनाया जा रहा है...',
+    verifyEmail: 'खाता बनाया गया! कृपया अपना ईमेल सत्यापित करें।',
+    afterVerify: 'ईमेल सत्यापन के बाद आप',
+    signInHere: 'यहाँ साइन इन करें',
+    yourFullName: 'आपका पूरा नाम',
     // Dashboard
     welcomeBack2: 'वापस स्वागत है',
     youAre: 'आप एक',
     with: 'के साथ',
     keepLearning: 'स्तर बढ़ाने के लिए सीखते रहें!',
+    loadingApp: 'Judexia लोड हो रहा है...',
     // Sidebar / Nav
     dashboard: 'डैशबोर्ड',
     aiCaseStudio: 'AI केस स्टूडियो',
@@ -111,6 +131,8 @@ export const translations = {
     draftNotice: 'नोटिस मसौदा',
     aboutUs: 'हमारे बारे में',
     logout: 'लॉग आउट',
+    legalAIPlatform: 'कानूनी AI मंच',
+    copyright: 'Judexia © 2026',
     // Footer
     disclaimer: 'Judexia एक शैक्षिक मंच है और आधिकारिक कानूनी सलाह नहीं देता। यहाँ दिखाए गए सभी AI आउटपुट प्रोटोटाइप सिमुलेशन हैं।',
     // Language
@@ -120,22 +142,26 @@ export const translations = {
     // About page
     aboutJudexia: 'Judexia के बारे में',
     aboutSubtitle: 'बुद्धिमान प्रणालियों के साथ अपना कानूनी दिमाग प्रशिक्षित करें',
+    legalTechPlatform: 'LegalTech मंच',
     whoWeAre: 'हम कौन हैं',
     whoWeAreText1: 'Judexia एक AI-संचालित LegalTech शिक्षण मंच है जो नागरिकों और कानून के बीच की खाई को पाटने के लिए बनाया गया है।',
     whoWeAreText2: 'हम जटिल कानूनी प्रणालियों को इंटरैक्टिव केस सिमुलेशन और बुद्धिमान मार्गदर्शन उपकरणों में बदलते हैं।',
     ourVision: 'हमारी दृष्टि',
-    visionText: 'हम एक ऐसे भविष्य की कल्पना करते हैं जहाँ कानूनी ज्ञान प्रत्येक डिजिटल रूप से जुड़े नागरिक के लिए सुलभ, व्यावहारिक और सशक्त हो। Judexia भारत का पहला AI-संचालित कानूनी तर्क पारिस्थितिकी तंत्र बनाने का लक्ष्य रखता है।',
+    visionText: 'हम एक ऐसे भविष्य की कल्पना करते हैं जहाँ कानूनी ज्ञान प्रत्येक डिजिटल रूप से जुड़े नागरिक के लिए सुलभ, व्यावहारिक और सशक्त हो। Judexia भारत का पहला AI-संचालित कानूनी तर्क पारिस्थितिकी तंत्र बनाने का लक्ष्य रखता है — कानूनी भ्रम को कानूनी आत्मविश्वास में बदलना।',
     whatMakesDifferent: 'हमें क्या अलग बनाता है',
     feature1: 'गेमिफाइड कानूनी तर्क',
-    feature1Desc: 'इंटरैक्टिव केस सिमुलेशन के माध्यम से कानून सीखें।',
+    feature1Desc: 'इंटरैक्टिव केस सिमुलेशन के माध्यम से कानून सीखें जो कानूनी तर्क को रोचक और यादगार बनाते हैं।',
     feature2: 'संवादात्मक AI गुरु',
     feature2Desc: 'भारतीय कानूनी ढांचे पर प्रशिक्षित AI गुरु से व्यक्तिगत मार्गदर्शन पाएं।',
     feature3: 'दस्तावेज़ सरलीकरण',
-    feature3Desc: 'जटिल कानूनी दस्तावेज़ों को सरल भाषा में अनुवाद करें।',
+    feature3Desc: 'जटिल कानूनी दस्तावेज़ों को सरल भाषा में अनुवाद करें जो आप वास्तव में समझ सकते हैं।',
     feature4: 'भारत-केंद्रित डिज़ाइन',
-    feature4Desc: 'भारत की कानूनी प्रणाली के लिए विशेष रूप से निर्मित।',
+    feature4Desc: 'भारत की कानूनी प्रणाली के लिए विशेष रूप से निर्मित, मोबाइल-प्रथम, बहुभाषी समर्थन के साथ।',
     feature5: 'स्केलेबल AI आर्किटेक्चर',
-    feature5Desc: 'एंटरप्राइज़-ग्रेड AI बुनियादी ढाँचा।',
+    feature5Desc: 'एंटरप्राइज़-ग्रेड AI बुनियादी ढाँचा जो आपकी कानूनी सीखने की यात्रा के साथ बढ़ता है।',
+    readyToStart: 'शुरू करने के लिए तैयार हैं?',
+    readyToStartDesc: 'आज भारत के प्रमुख AI-संचालित कानूनी शिक्षण मंच से जुड़ें।',
+    getStarted: 'शुरू करें',
   },
 } as const;
 
