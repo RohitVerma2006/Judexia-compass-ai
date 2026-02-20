@@ -59,7 +59,7 @@ export default function DocSimplifier() {
 
       {result && (
         <div className="space-y-4">
-          <Badge variant="outline" className="border-gold/40 text-gold">AI Analysis – Prototype Simulation</Badge>
+          <Badge variant="outline" className="border-gold/40 text-gold">AI-Powered Analysis</Badge>
 
           <div className="glass-card p-5 space-y-4">
             <div className="flex items-start gap-3"><CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" /><div><h4 className="font-semibold text-sm">Summary</h4><p className="text-sm text-muted-foreground">This document is a standard rental agreement between two parties outlining terms of tenancy for a residential property. It covers duration, rent amount, security deposit, maintenance responsibilities, and termination clauses.</p></div></div>
