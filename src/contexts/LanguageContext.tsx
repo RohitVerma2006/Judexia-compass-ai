@@ -49,12 +49,14 @@ export const translations = {
     lawyerConsult: 'Lawyer Consult',
     legalRoadmap: 'Legal Roadmap',
     draftNotice: 'Draft Notice',
+    consultRequests: 'Consultation Requests',
+    myEarnings: 'My Earnings',
     aboutUs: 'About Us',
     logout: 'Logout',
     legalAIPlatform: 'Legal AI Platform',
     copyright: 'Judexia © 2026',
     // Footer
-    disclaimer: 'Judexia is an educational platform and does not provide official legal advice. All AI outputs shown here are prototype simulations.',
+    disclaimer: 'Judexia is an educational platform and does not provide official legal advice.',
     // Language
     language: 'Language',
     english: 'English',
@@ -129,12 +131,14 @@ export const translations = {
     lawyerConsult: 'वकील परामर्श',
     legalRoadmap: 'कानूनी रोडमैप',
     draftNotice: 'नोटिस मसौदा',
+    consultRequests: 'परामर्श अनुरोध',
+    myEarnings: 'मेरी कमाई',
     aboutUs: 'हमारे बारे में',
     logout: 'लॉग आउट',
     legalAIPlatform: 'कानूनी AI मंच',
     copyright: 'Judexia © 2026',
     // Footer
-    disclaimer: 'Judexia एक शैक्षिक मंच है और आधिकारिक कानूनी सलाह नहीं देता। यहाँ दिखाए गए सभी AI आउटपुट प्रोटोटाइप सिमुलेशन हैं।',
+    disclaimer: 'Judexia एक शैक्षिक मंच है और आधिकारिक कानूनी सलाह नहीं देता।',
     // Language
     language: 'भाषा',
     english: 'अंग्रेज़ी',

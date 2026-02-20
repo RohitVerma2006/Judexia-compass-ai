@@ -19,12 +19,14 @@ import Forum from "./pages/Forum";
 import Consultation from "./pages/Consultation";
 import Roadmap from "./pages/Roadmap";
 import DraftNotice from "./pages/DraftNotice";
+import ConsultationRequests from "./pages/ConsultationRequests";
+import Earnings from "./pages/Earnings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
+  const { user, loading, role } = useAuth();
   if (loading) {
     return (
       <div className="min-h-screen gradient-bg flex items-center justify-center">
@@ -33,10 +35,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && role && !allowedRoles.includes(role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
   return <DashboardLayout>{children}</DashboardLayout>;
 }
 
-// Redirect already-authenticated users away from public auth pages
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return (
@@ -57,13 +61,15 @@ const AppRoutes = () => (
     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/dashboard/case-studio" element={<ProtectedRoute><CaseStudio /></ProtectedRoute>} />
     <Route path="/dashboard/mentor" element={<ProtectedRoute><AIMentor /></ProtectedRoute>} />
-    <Route path="/dashboard/quiz" element={<ProtectedRoute><QuizMode /></ProtectedRoute>} />
+    <Route path="/dashboard/quiz" element={<ProtectedRoute allowedRoles={['citizen', 'aspirant']}><QuizMode /></ProtectedRoute>} />
     <Route path="/dashboard/case-library" element={<ProtectedRoute><CaseLibrary /></ProtectedRoute>} />
-    <Route path="/dashboard/simplifier" element={<ProtectedRoute><DocSimplifier /></ProtectedRoute>} />
+    <Route path="/dashboard/simplifier" element={<ProtectedRoute allowedRoles={['citizen']}><DocSimplifier /></ProtectedRoute>} />
     <Route path="/dashboard/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
-    <Route path="/dashboard/consultation" element={<ProtectedRoute><Consultation /></ProtectedRoute>} />
-    <Route path="/dashboard/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
+    <Route path="/dashboard/consultation" element={<ProtectedRoute allowedRoles={['citizen', 'aspirant']}><Consultation /></ProtectedRoute>} />
+    <Route path="/dashboard/roadmap" element={<ProtectedRoute allowedRoles={['aspirant']}><Roadmap /></ProtectedRoute>} />
     <Route path="/dashboard/notice" element={<ProtectedRoute><DraftNotice /></ProtectedRoute>} />
+    <Route path="/dashboard/requests" element={<ProtectedRoute allowedRoles={['lawyer']}><ConsultationRequests /></ProtectedRoute>} />
+    <Route path="/dashboard/earnings" element={<ProtectedRoute allowedRoles={['lawyer']}><Earnings /></ProtectedRoute>} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
