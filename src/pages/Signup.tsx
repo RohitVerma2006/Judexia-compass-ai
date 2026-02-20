@@ -5,8 +5,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Users, GraduationCap, Scale } from 'lucide-react';
 import judexiaLogo from '@/assets/judexia-logo.jpg';
 import heroLibrary from '@/assets/hero-library.jpeg';
+
+type AppRole = 'citizen' | 'aspirant' | 'lawyer';
+
+const ROLES: { value: AppRole; label: string; labelHi: string; icon: typeof Users; desc: string; descHi: string }[] = [
+  { value: 'citizen', label: 'Citizen', labelHi: 'नागरिक', icon: Users, desc: 'Access legal tools & consultations', descHi: 'कानूनी उपकरण और परामर्श' },
+  { value: 'aspirant', label: 'Law Aspirant', labelHi: 'कानून अभ्यर्थी', icon: GraduationCap, desc: 'Advanced study & career roadmap', descHi: 'उन्नत अध्ययन और करियर रोडमैप' },
+  { value: 'lawyer', label: 'Lawyer', labelHi: 'वकील', icon: Scale, desc: 'Manage clients & consultations', descHi: 'ग्राहक और परामर्श प्रबंधन' },
+];
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
@@ -22,6 +31,7 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<AppRole | ''>('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,16 +42,14 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password !== confirmPassword) {
-      setError(t('passwordMismatch'));
-      return;
-    }
+    if (!selectedRole) { setError(lang === 'hi' ? 'कृपया एक भूमिका चुनें' : 'Please select a role'); return; }
+    if (password !== confirmPassword) { setError(t('passwordMismatch')); return; }
     setLoading(true);
     try {
-      await signup(fullName, email, password);
+      await signup(fullName, email, password, selectedRole);
       setSuccess(t('verifyEmail'));
     } catch (err: any) {
-      setError(err.message || 'Signup failed. Please try again.');
+      setError(err.message || 'Signup failed.');
     } finally {
       setLoading(false);
     }
@@ -49,11 +57,7 @@ const Signup = () => {
 
   const handleGoogleSignUp = async () => {
     setError('');
-    try {
-      await loginWithGoogle();
-    } catch (err: any) {
-      setError(err.message || 'Google sign-up failed.');
-    }
+    try { await loginWithGoogle(); } catch (err: any) { setError(err.message || 'Google sign-up failed.'); }
   };
 
   return (
@@ -70,23 +74,13 @@ const Signup = () => {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 overflow-y-auto">
         <div className="glass-card-gold p-8 w-full max-w-md animate-fade-in">
           {/* Language Toggle */}
           <div className="flex justify-end mb-4">
             <div className="flex items-center gap-1 bg-secondary/40 rounded-lg p-1">
-              <button
-                onClick={() => setLang('en')}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${lang === 'en' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => setLang('hi')}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${lang === 'hi' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                हिं
-              </button>
+              <button onClick={() => setLang('en')} className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${lang === 'en' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}>EN</button>
+              <button onClick={() => setLang('hi')} className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${lang === 'hi' ? 'bg-electric/20 text-electric' : 'text-muted-foreground hover:text-foreground'}`}>हिं</button>
             </div>
           </div>
 
@@ -97,17 +91,11 @@ const Signup = () => {
           </div>
 
           {/* Google Sign Up */}
-          <button
-            onClick={handleGoogleSignUp}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-border/50 bg-white/5 hover:bg-white/10 transition-all duration-200 group mb-5"
-          >
+          <button onClick={handleGoogleSignUp} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-border/50 bg-white/5 hover:bg-white/10 transition-all duration-200 group mb-5">
             <GoogleIcon />
-            <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">
-              {t('signUpGoogle')}
-            </span>
+            <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">{t('signUpGoogle')}</span>
           </button>
 
-          {/* Divider */}
           <div className="flex items-center mb-5 gap-3">
             <div className="flex-1 h-px bg-border/40" />
             <span className="text-xs text-muted-foreground/60 uppercase tracking-widest">{t('orContinueWith')}</span>
@@ -127,6 +115,29 @@ const Signup = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Role Selection */}
+              <div className="space-y-2">
+                <Label className="text-foreground/80">{lang === 'hi' ? 'भूमिका चुनें' : 'Select Your Role'} *</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {ROLES.map(r => {
+                    const Icon = r.icon;
+                    const active = selectedRole === r.value;
+                    return (
+                      <button
+                        key={r.value}
+                        type="button"
+                        onClick={() => setSelectedRole(r.value)}
+                        className={`p-3 rounded-xl border-2 transition-all text-center ${active ? 'border-electric bg-electric/10 glow-electric' : 'border-border/50 hover:border-electric/40'}`}
+                      >
+                        <Icon className={`w-5 h-5 mx-auto mb-1 ${active ? 'text-electric' : 'text-muted-foreground'}`} />
+                        <span className={`text-xs font-semibold block ${active ? 'text-electric' : 'text-foreground'}`}>{lang === 'hi' ? r.labelHi : r.label}</span>
+                        <span className="text-[10px] text-muted-foreground block mt-0.5">{lang === 'hi' ? r.descHi : r.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label className="text-foreground/80">{t('fullName')}</Label>
                 <Input value={fullName} onChange={e => setFullName(e.target.value)} placeholder={t('yourFullName')} required className="bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground" />
@@ -144,11 +155,7 @@ const Signup = () => {
                 <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" required className="bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground" />
               </div>
               {error && <p className="text-destructive text-sm">{error}</p>}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full gradient-electric text-foreground font-semibold glow-electric hover:opacity-90 transition-opacity"
-              >
+              <Button type="submit" disabled={loading} className="w-full gradient-electric text-foreground font-semibold glow-electric hover:opacity-90 transition-opacity">
                 {loading ? t('creatingAccount') : t('createAccount')}
               </Button>
             </form>
