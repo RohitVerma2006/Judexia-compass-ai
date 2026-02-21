@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, CheckCircle, X } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,21 +13,51 @@ interface Notification {
 
 export default function NotificationBell() {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([
-    // Default mock notifications
-    { id: 'mock-1', message: 'Your consultation with Adv. Priya Sharma is confirmed.', read: false, created_at: new Date().toISOString() },
-    { id: 'mock-2', message: 'Welcome to Judexia! Start exploring legal modules.', read: true, created_at: new Date(Date.now() - 86400000).toISOString() },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    // Fetch real notifications
+    const fetchNotifications = async () => {
+      const { data } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (data) setNotifications(data as Notification[]);
+    };
+    fetchNotifications();
+
+    // Listen for new notifications in real-time
+    const channel = supabase
+      .channel('user-notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        setNotifications(prev => [payload.new as Notification, ...prev]);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const markAsRead = (id: string) => {
+  const markAsRead = async (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    await supabase.from('notifications').update({ read: true }).eq('id', id);
   };
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    if (user) {
+      await supabase.from('notifications').update({ read: true }).eq('user_id', user.id);
+    }
   };
 
   return (

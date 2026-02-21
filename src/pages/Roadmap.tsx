@@ -1,93 +1,229 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Map, CheckCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { CheckCircle, Circle, ChevronDown, ChevronUp, Zap, Brain, HelpCircle, FileText, BookOpen, Trophy } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const GOALS = [
-  { id: 'clat', label: 'CLAT Aspirant', desc: 'Prepare for Common Law Admission Test' },
-  { id: 'judiciary', label: 'Judiciary Aspirant', desc: 'Prepare for judicial services examination' },
-  { id: 'student', label: 'Law Student', desc: 'Strengthen academic legal knowledge' },
-  { id: 'citizen', label: 'Citizen Awareness', desc: 'Understand your legal rights' },
+interface Task {
+  id: string;
+  label: string;
+  xp: number;
+  completed: boolean;
+  link?: string;
+}
+
+interface Level {
+  id: string;
+  title: string;
+  description: string;
+  tasks: Task[];
+}
+
+const INITIAL_LEVELS: Level[] = [
+  {
+    id: 'level-1',
+    title: 'Foundation',
+    description: 'Build your legal basics',
+    tasks: [
+      { id: 't1-1', label: 'Complete your first AI Case Studio session', xp: 20, completed: false, link: '/dashboard/case-studio' },
+      { id: 't1-2', label: 'Score 60%+ in a Quiz', xp: 25, completed: false, link: '/dashboard/quiz' },
+      { id: 't1-3', label: 'Simplify a legal document', xp: 15, completed: false, link: '/dashboard/simplifier' },
+      { id: 't1-4', label: 'Read 2 cases from Case Library', xp: 20, completed: false, link: '/dashboard/case-library' },
+    ],
+  },
+  {
+    id: 'level-2',
+    title: 'Intermediate',
+    description: 'Deepen your legal reasoning',
+    tasks: [
+      { id: 't2-1', label: 'Analyze a Fundamental Rights case in Case Studio', xp: 30, completed: false, link: '/dashboard/case-studio' },
+      { id: 't2-2', label: 'Ask 5 questions to AI Legal Mentor', xp: 25, completed: false, link: '/dashboard/mentor' },
+      { id: 't2-3', label: 'Score 80%+ in Quiz Mode', xp: 35, completed: false, link: '/dashboard/quiz' },
+      { id: 't2-4', label: 'Read landmark cases: Maneka Gandhi, Kesavananda', xp: 30, completed: false, link: '/dashboard/case-library' },
+    ],
+  },
+  {
+    id: 'level-3',
+    title: 'Advanced',
+    description: 'Master complex legal analysis',
+    tasks: [
+      { id: 't3-1', label: 'Write a complete case analysis and get 8/10+ from AI', xp: 50, completed: false, link: '/dashboard/case-studio' },
+      { id: 't3-2', label: 'Draft a legal notice', xp: 40, completed: false, link: '/dashboard/notice' },
+      { id: 't3-3', label: 'Complete all Quiz categories', xp: 45, completed: false, link: '/dashboard/quiz' },
+      { id: 't3-4', label: 'Participate in Community Forum', xp: 20, completed: false, link: '/dashboard/forum' },
+    ],
+  },
+  {
+    id: 'level-4',
+    title: 'Expert',
+    description: 'Become a legal reasoning expert',
+    tasks: [
+      { id: 't4-1', label: 'Analyze 10 different case topics in Case Studio', xp: 60, completed: false, link: '/dashboard/case-studio' },
+      { id: 't4-2', label: 'Score 90%+ in all Quiz categories', xp: 50, completed: false, link: '/dashboard/quiz' },
+      { id: 't4-3', label: 'Help others in Community Forum (5 replies)', xp: 30, completed: false, link: '/dashboard/forum' },
+      { id: 't4-4', label: 'Complete a full mock consultation analysis', xp: 40, completed: false, link: '/dashboard/case-studio' },
+    ],
+  },
 ];
 
-const ROADMAPS: Record<string, { week: string; topic: string; task: string }[]> = {
-  clat: [
-    { week: 'Week 1-2', topic: 'Legal Reasoning Basics', task: 'Practice 50 legal reasoning questions daily' },
-    { week: 'Week 3-4', topic: 'Indian Constitution – Part III', task: 'Study Articles 12-35, solve case-based questions' },
-    { week: 'Week 5-6', topic: 'Contract Law & Torts', task: 'Read key cases: Carlill v Carbolic, Donoghue v Stevenson' },
-    { week: 'Week 7-8', topic: 'Criminal Law Basics', task: 'Study IPC Sections 299-304, practice MCQs' },
-  ],
-  judiciary: [
-    { week: 'Week 1-2', topic: 'Constitutional Law – Advanced', task: 'Study Basic Structure Doctrine, Fundamental Rights deeply' },
-    { week: 'Week 3-4', topic: 'CrPC & Evidence Act', task: 'Focus on procedure, bail provisions, evidence admissibility' },
-    { week: 'Week 5-6', topic: 'Civil Procedure Code', task: 'Study Orders I-XXI, practice moot problems' },
-    { week: 'Week 7-8', topic: 'Mock Tests & Answer Writing', task: 'Write 3 full-length mock tests, review model answers' },
-  ],
-  student: [
-    { week: 'Week 1-2', topic: 'Jurisprudence Fundamentals', task: 'Study schools of law: Natural, Positivist, Realist' },
-    { week: 'Week 3-4', topic: 'Contract Law', task: 'Indian Contract Act 1872 – Offer, Acceptance, Consideration' },
-    { week: 'Week 5-6', topic: 'Constitutional Law', task: 'Fundamental Rights and Directive Principles' },
-    { week: 'Week 7-8', topic: 'Moot Court Preparation', task: 'Draft memorials, practice oral arguments' },
-  ],
-  citizen: [
-    { week: 'Week 1-2', topic: 'Know Your Rights', task: 'Study fundamental rights under Part III of Constitution' },
-    { week: 'Week 3-4', topic: 'Consumer Protection', task: 'Understand Consumer Protection Act 2019, filing complaints' },
-    { week: 'Week 5-6', topic: 'Property & Rental Laws', task: 'Learn about Rent Control Act, Transfer of Property Act' },
-    { week: 'Week 7-8', topic: 'Cyber Law Basics', task: 'Study IT Act 2000, online fraud prevention' },
-  ],
-};
+const STORAGE_KEY = 'judexia-roadmap-progress';
 
 export default function Roadmap() {
-  const [goal, setGoal] = useState('');
-  const [generated, setGenerated] = useState(false);
-  const { addXP } = useAuth();
+  const { addXP, xp } = useAuth();
+  const [levels, setLevels] = useState<Level[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : INITIAL_LEVELS;
+  });
+  const [expandedLevel, setExpandedLevel] = useState<string | null>('level-1');
+  const [animatingTask, setAnimatingTask] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    if (goal) { setGenerated(true); addXP(15); }
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(levels));
+  }, [levels]);
+
+  const totalTasks = levels.reduce((sum, l) => sum + l.tasks.length, 0);
+  const completedTasks = levels.reduce((sum, l) => sum + l.tasks.filter(t => t.completed).length, 0);
+  const overallProgress = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  const toggleTask = (levelId: string, taskId: string) => {
+    setLevels(prev => prev.map(l => {
+      if (l.id !== levelId) return l;
+      return {
+        ...l,
+        tasks: l.tasks.map(t => {
+          if (t.id !== taskId) return t;
+          if (!t.completed) {
+            setAnimatingTask(taskId);
+            setTimeout(() => setAnimatingTask(null), 1000);
+            addXP(t.xp);
+          }
+          return { ...t, completed: !t.completed };
+        }),
+      };
+    }));
   };
+
+  const getLevelProgress = (level: Level) => {
+    const done = level.tasks.filter(t => t.completed).length;
+    return level.tasks.length ? Math.round((done / level.tasks.length) * 100) : 0;
+  };
+
+  const getLevelXP = (level: Level) => level.tasks.reduce((sum, t) => sum + (t.completed ? t.xp : 0), 0);
+  const getLevelTotalXP = (level: Level) => level.tasks.reduce((sum, t) => sum + t.xp, 0);
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="glass-card-gold p-4">
-        <h2 className="font-serif text-xl font-bold">Personalized Legal Roadmap</h2>
-        <p className="text-sm text-muted-foreground">Select your goal and get an AI-generated study plan.</p>
+      {/* Growth Score */}
+      <div className="glass-card-gold p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="font-serif text-xl font-bold">Your Legal Growth Score</h2>
+            <p className="text-sm text-muted-foreground">Track your learning journey and unlock achievements.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Trophy className="w-6 h-6 text-gold" />
+            <span className="font-serif text-2xl font-bold text-gold">{overallProgress}%</span>
+          </div>
+        </div>
+        <Progress value={overallProgress} className="h-3 bg-muted [&>div]:bg-gradient-to-r [&>div]:from-electric [&>div]:to-gold" />
+        <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+          <span>{completedTasks} of {totalTasks} tasks completed</span>
+          <span className="text-gold font-semibold">{xp} XP earned</span>
+        </div>
       </div>
 
-      {!generated ? (
+      {/* Timeline */}
+      <div className="relative">
+        {/* Connector line */}
+        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-electric via-gold to-muted hidden md:block" />
+
         <div className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            {GOALS.map(g => (
-              <button key={g.id} onClick={() => setGoal(g.id)} className={`glass-card p-5 text-left transition-all ${goal === g.id ? 'border-electric glow-electric' : 'hover:border-electric/30'}`}>
-                <h3 className="font-serif font-semibold">{g.label}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{g.desc}</p>
-              </button>
-            ))}
-          </div>
-          <Button onClick={handleGenerate} disabled={!goal} className="w-full gradient-electric glow-electric">Generate Roadmap</Button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <Badge variant="outline" className="border-gold/40 text-gold">AI Generated Plan – Demo Preview</Badge>
-          <div className="space-y-3">
-            {ROADMAPS[goal]?.map((item, i) => (
-              <div key={i} className="glass-card p-5 flex gap-4">
-                <div className="w-10 h-10 rounded-lg bg-electric/10 flex items-center justify-center shrink-0">
-                  <Map className="w-5 h-5 text-electric" />
+          {levels.map((level, idx) => {
+            const progress = getLevelProgress(level);
+            const isExpanded = expandedLevel === level.id;
+            const isComplete = progress === 100;
+
+            return (
+              <div key={level.id} className="relative">
+                {/* Timeline dot */}
+                <div className={`hidden md:flex absolute left-6 w-5 h-5 rounded-full border-2 items-center justify-center z-10 transition-all ${
+                  isComplete ? 'bg-gold border-gold' : progress > 0 ? 'bg-electric/20 border-electric' : 'bg-muted border-border'
+                }`}>
+                  {isComplete && <CheckCircle className="w-3 h-3 text-background" />}
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gold font-semibold text-sm">{item.week}</span>
-                    <span className="text-foreground font-medium text-sm">– {item.topic}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1 flex items-start gap-1"><CheckCircle className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />{item.task}</p>
+
+                <div className={`md:ml-16 glass-card overflow-hidden transition-all duration-300 ${isComplete ? 'border-gold/30' : ''}`}>
+                  <button
+                    onClick={() => setExpandedLevel(isExpanded ? null : level.id)}
+                    className="w-full p-5 flex items-center justify-between text-left hover:bg-secondary/20 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                        isComplete ? 'bg-gold/20' : 'bg-electric/10'
+                      }`}>
+                        <span className="font-serif font-bold text-sm">{idx + 1}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-serif font-semibold text-foreground">{level.title}</h3>
+                        <p className="text-xs text-muted-foreground">{level.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right hidden sm:block">
+                        <p className="text-xs text-muted-foreground">{progress}%</p>
+                        <p className="text-[10px] text-gold">{getLevelXP(level)}/{getLevelTotalXP(level)} XP</p>
+                      </div>
+                      <div className="w-16">
+                        <Progress value={progress} className={`h-1.5 bg-muted ${isComplete ? '[&>div]:bg-gold' : '[&>div]:bg-electric'}`} />
+                      </div>
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="px-5 pb-5 space-y-2 border-t border-border/30 pt-3">
+                      {level.tasks.map(task => (
+                        <div
+                          key={task.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                            task.completed ? 'bg-gold/5' : 'hover:bg-secondary/20'
+                          } ${animatingTask === task.id ? 'animate-scale-in' : ''}`}
+                        >
+                          <button onClick={() => toggleTask(level.id, task.id)} className="shrink-0">
+                            {task.completed ? (
+                              <CheckCircle className="w-5 h-5 text-gold" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-muted-foreground hover:text-electric transition-colors" />
+                            )}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                              {task.label}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                              task.completed ? 'bg-gold/10 text-gold' : 'bg-electric/10 text-electric'
+                            }`}>
+                              <Zap className="w-3 h-3 inline mr-0.5" />{task.xp} XP
+                            </span>
+                            {task.link && !task.completed && (
+                              <Link to={task.link} className="text-[10px] px-2 py-1 rounded bg-electric/10 text-electric hover:bg-electric/20 transition-colors">
+                                Go →
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-          <Button variant="ghost" onClick={() => { setGenerated(false); setGoal(''); }}>← Choose Another Goal</Button>
+            );
+          })}
         </div>
-      )}
+      </div>
     </div>
   );
 }
