@@ -2,10 +2,11 @@ import { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import {
   Brain, MessageSquare, HelpCircle, BookOpen, FileText,
   Users, Scale, Map, FileEdit, LogOut, Zap, Award, Globe,
-  ClipboardList, DollarSign
+  ClipboardList, DollarSign, Moon, Sun
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +23,7 @@ const ALL_NAV = [
   { path: '/dashboard/simplifier', labelKey: 'docSimplifier', icon: FileText, roles: ['citizen'] },
   { path: '/dashboard/forum', labelKey: 'communityForum', icon: Users, roles: ['citizen', 'aspirant', 'lawyer'] },
   { path: '/dashboard/consultation', labelKey: 'lawyerConsult', icon: Scale, roles: ['citizen', 'aspirant'] },
-  { path: '/dashboard/roadmap', labelKey: 'legalRoadmap', icon: Map, roles: ['aspirant'] },
+  { path: '/dashboard/roadmap', labelKey: 'legalRoadmap', icon: Map, roles: ['citizen', 'aspirant'] },
   { path: '/dashboard/notice', labelKey: 'draftNotice', icon: FileEdit, roles: ['citizen', 'aspirant', 'lawyer'] },
   { path: '/dashboard/requests', labelKey: 'consultRequests', icon: ClipboardList, roles: ['lawyer'] },
   { path: '/dashboard/earnings', labelKey: 'myEarnings', icon: DollarSign, roles: ['lawyer'] },
@@ -31,6 +32,7 @@ const ALL_NAV = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, xp, getLevel, logout, role } = useAuth();
   const { t, lang, setLang } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const level = getLevel();
@@ -75,7 +77,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </Link>
             );
           })}
-          {/* About link */}
           <Link
             to="/about"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground border-t border-sidebar-border mt-1 pt-2.5"
@@ -116,7 +117,27 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <NotificationBell />
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-all text-xs font-medium"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-gold" />
+                  <span className="text-muted-foreground">Dark</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-gold" />
+                  <span className="text-muted-foreground">Light</span>
+                </>
+              )}
+            </button>
+
+            {/* Notification bell only for citizen/aspirant */}
+            {userRole !== 'lawyer' && <NotificationBell />}
 
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-gold" />

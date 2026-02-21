@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import About from "./pages/About";
@@ -66,7 +67,7 @@ const AppRoutes = () => (
     <Route path="/dashboard/simplifier" element={<ProtectedRoute allowedRoles={['citizen']}><DocSimplifier /></ProtectedRoute>} />
     <Route path="/dashboard/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
     <Route path="/dashboard/consultation" element={<ProtectedRoute allowedRoles={['citizen', 'aspirant']}><Consultation /></ProtectedRoute>} />
-    <Route path="/dashboard/roadmap" element={<ProtectedRoute allowedRoles={['aspirant']}><Roadmap /></ProtectedRoute>} />
+    <Route path="/dashboard/roadmap" element={<ProtectedRoute allowedRoles={['citizen', 'aspirant']}><Roadmap /></ProtectedRoute>} />
     <Route path="/dashboard/notice" element={<ProtectedRoute><DraftNotice /></ProtectedRoute>} />
     <Route path="/dashboard/requests" element={<ProtectedRoute allowedRoles={['lawyer']}><ConsultationRequests /></ProtectedRoute>} />
     <Route path="/dashboard/earnings" element={<ProtectedRoute allowedRoles={['lawyer']}><Earnings /></ProtectedRoute>} />
@@ -77,15 +78,17 @@ const AppRoutes = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

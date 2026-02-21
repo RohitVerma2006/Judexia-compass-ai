@@ -241,6 +241,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      upvote_forum_post: { Args: { post_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "citizen" | "aspirant" | "lawyer"

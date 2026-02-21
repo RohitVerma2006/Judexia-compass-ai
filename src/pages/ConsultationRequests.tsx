@@ -1,30 +1,86 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Clock, CheckCircle, XCircle, Calendar, IndianRupee } from 'lucide-react';
+import { User, Clock, CheckCircle, XCircle, Calendar, IndianRupee, Loader2 } from 'lucide-react';
 
 interface Request {
   id: string;
-  citizenName: string;
-  issue: string;
-  date: string;
-  time: string;
+  citizen_id: string;
+  issue_description: string;
+  scheduled_date: string;
+  scheduled_time: string;
   fee: number;
-  paymentStatus: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed';
+  payment_status: string;
+  status: string;
+  category: string;
+  citizen_name?: string;
 }
 
-const MOCK_REQUESTS: Request[] = [
-  { id: '1', citizenName: 'Rahul Kumar', issue: 'Property dispute with neighbor regarding boundary wall construction', date: '2026-02-25', time: '10:00 AM', fee: 1500, paymentStatus: 'paid', status: 'pending' },
-  { id: '2', citizenName: 'Sneha Patel', issue: 'Seeking divorce proceedings guidance and child custody rights', date: '2026-02-26', time: '2:00 PM', fee: 1500, paymentStatus: 'paid', status: 'pending' },
-  { id: '3', citizenName: 'Amit Singh', issue: 'Wrongful termination from employment, seeking compensation', date: '2026-02-22', time: '11:30 AM', fee: 1500, paymentStatus: 'paid', status: 'accepted' },
-  { id: '4', citizenName: 'Kavitha Nair', issue: 'Consumer complaint against e-commerce platform for defective product', date: '2026-02-18', time: '3:30 PM', fee: 1500, paymentStatus: 'paid', status: 'completed' },
-];
-
 export default function ConsultationRequests() {
-  const [requests, setRequests] = useState(MOCK_REQUESTS);
+  const { user } = useAuth();
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleAction = (id: string, action: 'accepted' | 'rejected') => {
+  const fetchRequests = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('consultations')
+      .select('*')
+      .eq('lawyer_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      // Fetch citizen names
+      const citizenIds = [...new Set(data.map((d: any) => d.citizen_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', citizenIds.length ? citizenIds : ['none']);
+
+      const nameMap = new Map((profiles || []).map((p: any) => [p.user_id, p.full_name]));
+      setRequests(data.map((d: any) => ({ ...d, citizen_name: nameMap.get(d.citizen_id) || 'Unknown' })));
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchRequests();
+
+    // Real-time updates
+    if (user) {
+      const channel = supabase
+        .channel('lawyer-consultations')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'consultations',
+          filter: `lawyer_id=eq.${user.id}`,
+        }, () => fetchRequests())
+        .subscribe();
+
+      return () => { supabase.removeChannel(channel); };
+    }
+  }, [user]);
+
+  const handleAction = async (id: string, action: 'accepted' | 'rejected') => {
+    await supabase.from('consultations').update({ status: action }).eq('id', id);
+    
+    // Find the request to get citizen info
+    const req = requests.find(r => r.id === id);
+    if (req && user) {
+      const message = action === 'accepted'
+        ? `Your consultation with ${user.fullName} is confirmed for ${req.scheduled_date} at ${req.scheduled_time}.`
+        : `Your consultation request has been declined. Please try booking another lawyer.`;
+      
+      await supabase.from('notifications').insert({
+        user_id: req.citizen_id,
+        message,
+        consultation_id: id,
+      });
+    }
+
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action } : r));
   };
 
@@ -35,22 +91,22 @@ export default function ConsultationRequests() {
           <User className="w-5 h-5 text-electric" />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-sm">{req.citizenName}</h4>
-          <p className="text-xs text-muted-foreground truncate">{req.issue}</p>
+          <h4 className="font-semibold text-sm">{req.citizen_name}</h4>
+          <p className="text-xs text-muted-foreground truncate">{req.issue_description}</p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div className="flex items-center gap-1.5 text-muted-foreground">
-          <Calendar className="w-3 h-3" /> {req.date}
+          <Calendar className="w-3 h-3" /> {req.scheduled_date}
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground">
-          <Clock className="w-3 h-3" /> {req.time}
+          <Clock className="w-3 h-3" /> {req.scheduled_time}
         </div>
         <div className="flex items-center gap-1.5 text-gold">
           <IndianRupee className="w-3 h-3" /> ₹{req.fee}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[10px] font-medium">{req.paymentStatus}</span>
+          <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[10px] font-medium">{req.payment_status}</span>
         </div>
       </div>
       {req.status === 'pending' && (
@@ -83,6 +139,14 @@ export default function ConsultationRequests() {
       )}
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin text-electric" />
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-6">

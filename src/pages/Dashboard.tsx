@@ -10,7 +10,7 @@ const ALL_MODULES = [
   { path: '/dashboard/simplifier', label: 'Document Simplifier', icon: FileText, desc: 'Simplify complex legal documents', color: 'from-cyan-500/20 to-cyan-600/10', roles: ['citizen'] },
   { path: '/dashboard/forum', label: 'Community Forum', icon: Users, desc: 'Discuss with peers', color: 'from-rose-500/20 to-rose-600/10', roles: ['citizen', 'aspirant', 'lawyer'] },
   { path: '/dashboard/consultation', label: 'Lawyer Consultation', icon: Scale, desc: 'Book expert consultations', color: 'from-indigo-500/20 to-indigo-600/10', roles: ['citizen', 'aspirant'] },
-  { path: '/dashboard/roadmap', label: 'Legal Roadmap', icon: Map, desc: 'Plan your legal career path', color: 'from-teal-500/20 to-teal-600/10', roles: ['aspirant'] },
+  { path: '/dashboard/roadmap', label: 'Legal Roadmap', icon: Map, desc: 'Plan your legal career path', color: 'from-teal-500/20 to-teal-600/10', roles: ['citizen', 'aspirant'] },
   { path: '/dashboard/notice', label: 'Draft Notice Generator', icon: FileEdit, desc: 'Generate legal notices', color: 'from-orange-500/20 to-orange-600/10', roles: ['citizen', 'aspirant', 'lawyer'] },
   // Lawyer-only modules
   { path: '/dashboard/requests', label: 'Consultation Requests', icon: ClipboardList, desc: 'Manage client requests', color: 'from-indigo-500/20 to-indigo-600/10', roles: ['lawyer'] },
